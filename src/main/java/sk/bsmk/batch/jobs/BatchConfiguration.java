@@ -23,6 +23,8 @@ import javax.sql.DataSource;
 @EnableBatchProcessing
 public class BatchConfiguration {
 
+  public static final String JOB_NAME = "fxmarket_prices_etl_job";
+
   @Autowired
   public JobBuilderFactory jobBuilderFactory;
 
@@ -58,7 +60,7 @@ public class BatchConfiguration {
 
   @Bean
   public Job importUserJob(JobCompletionNotificationListener listener, Step step1) {
-    return jobBuilderFactory.get("importUserJob")
+    return jobBuilderFactory.get(JOB_NAME)
       .incrementer(new RunIdIncrementer())
       .listener(listener)
       .flow(step1)
