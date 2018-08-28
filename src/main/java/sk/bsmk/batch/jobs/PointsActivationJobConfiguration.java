@@ -12,8 +12,7 @@ import org.springframework.context.annotation.Configuration;
 import sk.bsmk.batch.points.Points;
 
 @Configuration
-@EnableBatchProcessing
-public class PointsActivationConfiguration {
+public class PointsActivationJobConfiguration {
 
   public static final String JOB_NAME = "points_activation";
 
