@@ -44,7 +44,7 @@ public class PointsActivationJobConfiguration {
       .<Points, Points>chunk(1)
       .reader(reader)
       .processor(processor)
-      .writer(writer)
+//      .writer(writer)
       .build();
   }
 
