@@ -10,12 +10,14 @@ import java.util.Map;
 import java.util.Random;
 import java.util.UUID;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
 @Service
 public class PointsService {
 
+  private final AtomicInteger numberOfActivations = new AtomicInteger();
   private final Random random;
   private final Clock clock;
   private final Map<UUID, Points> repo = new ConcurrentHashMap<>();
@@ -24,6 +26,10 @@ public class PointsService {
   public PointsService(Random random, Clock clock) {
     this.random = random;
     this.clock = clock;
+  }
+
+  public Integer getNumberOfActivations() {
+    return numberOfActivations.get();
   }
 
   /**
@@ -41,6 +47,9 @@ public class PointsService {
    */
   public Points activate(UUID pointId) {
     final Points points = repo.get(pointId);
+
+    numberOfActivations.incrementAndGet();
+
     return ImmutablePoints.copyOf(points)
       .withState(PointState.ACTIVE)
       .withUpdatedAt(clock.instant());

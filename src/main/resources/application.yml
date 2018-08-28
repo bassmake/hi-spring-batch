@@ -3,5 +3,7 @@ server:
 
 management.endpoints.web.exposure.include: "*"
 
+spring.batch.job.enabled: false
+
 spring.quartz.job-store-type: jdbc
 spring.quartz.jdbc.initialize-schema: always
