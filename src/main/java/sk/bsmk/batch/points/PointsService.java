@@ -1,5 +1,7 @@
 package sk.bsmk.batch.points;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,6 +18,8 @@ import java.util.stream.IntStream;
 
 @Service
 public class PointsService {
+
+  private static final Logger log = LoggerFactory.getLogger(PointsService.class);
 
   private final AtomicInteger numberOfActivations = new AtomicInteger();
   private final Random random;
@@ -36,9 +40,11 @@ public class PointsService {
    * Returns points that should be activated.
    */
   public List<Points> findPointsToActivate() {
-    return IntStream.range(1, randomInt(10))
+    final int rowsToGenerate = randomInt(10);
+    log.info("Going to generate {} rows", rowsToGenerate);
+    return IntStream.range(1, rowsToGenerate)
       .mapToObj(this::points)
-      .map(points -> repo.put(points.id(), points))
+      .peek(points -> repo.put(points.id(), points))
       .collect(Collectors.toList());
   }
 

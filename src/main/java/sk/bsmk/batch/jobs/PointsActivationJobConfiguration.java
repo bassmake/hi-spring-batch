@@ -2,7 +2,6 @@ package sk.bsmk.batch.jobs;
 
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
-import org.springframework.batch.core.configuration.annotation.EnableBatchProcessing;
 import org.springframework.batch.core.configuration.annotation.JobBuilderFactory;
 import org.springframework.batch.core.configuration.annotation.StepBuilderFactory;
 import org.springframework.batch.core.launch.support.RunIdIncrementer;
@@ -14,7 +13,7 @@ import sk.bsmk.batch.points.Points;
 @Configuration
 public class PointsActivationJobConfiguration {
 
-  public static final String JOB_NAME = "points_activation";
+  public static final String JOB_NAME = "points_activation_job";
 
   @Autowired
   public JobBuilderFactory jobBuilderFactory;
@@ -42,7 +41,7 @@ public class PointsActivationJobConfiguration {
     PointsActivationWriter writer
   ) {
     return stepBuilderFactory.get("points_activation_step")
-      .<Points, Points>chunk(100_000)
+      .<Points, Points>chunk(1)
       .reader(reader)
       .processor(processor)
       .writer(writer)

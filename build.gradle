@@ -2,6 +2,7 @@ buildscript {
   ext {
     springBootVersion = '2.0.4.RELEASE'
     immutablesVersion = '2.7.1'
+    shedLockVersion = '1.0.0'
   }
 
   repositories {
@@ -41,7 +42,8 @@ dependencies {
   compile "org.springframework.boot:spring-boot-starter-batch"
   compile "org.springframework.boot:spring-boot-starter-web"
   compile "org.springframework.boot:spring-boot-starter-actuator"
-  compile "net.javacrumbs.shedlock:shedlock-spring:1.0.0"
+  compile "net.javacrumbs.shedlock:shedlock-spring:$shedLockVersion"
+  compile "net.javacrumbs.shedlock:shedlock-provider-jdbc-template:$shedLockVersion"
 
   compile "org.hsqldb:hsqldb"
 

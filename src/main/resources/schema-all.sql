@@ -1,7 +1,9 @@
-DROP TABLE people IF EXISTS;
+DROP TABLE shedlock IF EXISTS;
 
-CREATE TABLE people  (
-    person_id BIGINT IDENTITY NOT NULL PRIMARY KEY,
-    first_name VARCHAR(20),
-    last_name VARCHAR(20)
+CREATE TABLE shedlock(
+    name VARCHAR(64),
+    lock_until TIMESTAMP(3) NULL,
+    locked_at TIMESTAMP(3) NULL,
+    locked_by  VARCHAR(255),
+    PRIMARY KEY (name)
 );
