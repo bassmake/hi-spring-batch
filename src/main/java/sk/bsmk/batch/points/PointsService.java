@@ -53,10 +53,13 @@ public class PointsService {
     final int rowsToGenerate = randomInt(10);
     log.info("Going to generate {} rows", rowsToGenerate);
     generations.put(numberOfGenerations.incrementAndGet(), rowsToGenerate);
-    return IntStream.range(1, rowsToGenerate)
+    final List<Points> generated = IntStream.range(0, rowsToGenerate)
       .mapToObj(this::points)
       .peek(points -> repo.put(points.id(), points))
       .collect(Collectors.toList());
+
+    assert generated.size() == rowsToGenerate : "Different number of points generated than expected";
+    return generated;
   }
 
   /**

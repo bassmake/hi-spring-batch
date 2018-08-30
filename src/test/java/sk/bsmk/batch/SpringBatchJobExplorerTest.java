@@ -1,6 +1,9 @@
 package sk.bsmk.batch;
 
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.batch.core.BatchStatus;
 import org.springframework.batch.core.JobExecution;
 import org.springframework.batch.core.JobInstance;
 import org.springframework.batch.core.StepExecution;
@@ -16,6 +19,8 @@ import static org.assertj.core.api.Assertions.in;
 import static sk.bsmk.batch.jobs.JobsSchedulingConfiguration.INITIAL_DELAY;
 
 public class SpringBatchJobExplorerTest extends SpringBatchTest {
+
+  private static final Logger log = LoggerFactory.getLogger(SpringBatchJobExplorerTest.class);
 
   @Autowired
   PointsService pointsService;
@@ -46,13 +51,27 @@ public class SpringBatchJobExplorerTest extends SpringBatchTest {
   }
 
   private void validate(JobInstance jobInstance, int index) {
+    log.info("Validating {}: {}", index, jobInstance);
     final List<JobExecution> jobExecutions = jobExplorer.getJobExecutions(jobInstance);
 
     assertThat(jobExecutions).hasSize(1);
 
     final JobExecution jobExecution = jobExplorer.getJobExecution(jobExecutions.get(0).getId());
     final StepExecution stepExecution = stepExecution(jobExecution);
-    assertThat(stepExecution.getCommitCount()).isEqualTo(pointsService.generations().get(index));
+    final int count = pointsService.generations().get(index);
+
+    assertThat(stepExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+
+    assertThat(stepExecution.getReadCount()).isEqualTo(count);
+    assertThat(stepExecution.getWriteCount()).isEqualTo(count);
+    assertThat(stepExecution.getCommitCount()).isEqualTo(count + 1);
+
+    assertThat(stepExecution.getRollbackCount()).isEqualTo(0);
+    assertThat(stepExecution.getReadSkipCount()).isEqualTo(0);
+    assertThat(stepExecution.getProcessSkipCount()).isEqualTo(0);
+    assertThat(stepExecution.getWriteSkipCount()).isEqualTo(0);
+    assertThat(stepExecution.getFilterCount()).isEqualTo(0);
+    assertThat(stepExecution.getFailureExceptions()).isEmpty();
   }
 
   private StepExecution stepExecution(JobExecution execution) {
