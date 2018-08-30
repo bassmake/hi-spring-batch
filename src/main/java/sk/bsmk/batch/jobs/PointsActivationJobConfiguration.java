@@ -8,6 +8,7 @@ import org.springframework.batch.core.launch.support.RunIdIncrementer;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Scope;
 import sk.bsmk.batch.points.Points;
 
 @Configuration
@@ -22,6 +23,7 @@ public class PointsActivationJobConfiguration {
   public StepBuilderFactory stepBuilderFactory;
 
   @Bean
+  @Scope("prototype")
   public Job pointsActivationJob(
     JobCompletionNotificationListener listener,
     Step pointsActivationStep
@@ -37,14 +39,12 @@ public class PointsActivationJobConfiguration {
   @Bean
   public Step pointsActivationStep(
     PointsActivationReader reader,
-    PointsActivationProcessor processor,
-    PointsActivationWriter writer
+    PointsActivationProcessor processor
   ) {
     return stepBuilderFactory.get("points_activation_step")
       .<Points, Points>chunk(1)
       .reader(reader)
       .processor(processor)
-//      .writer(writer)
       .build();
   }
 
