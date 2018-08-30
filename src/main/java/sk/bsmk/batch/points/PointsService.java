@@ -68,6 +68,9 @@ public class PointsService {
   public Points activate(UUID pointId) {
     final Points points = repo.get(pointId);
 
+    if (points.processingFailure()) {
+      return null;
+    }
     numberOfActivations.incrementAndGet();
 
     return ImmutablePoints.copyOf(points)
@@ -82,6 +85,7 @@ public class PointsService {
       .owner("owner-" + index)
       .state(PointState.PENDING)
       .amount(randomInt(100))
+      .processingFailure(index % 2 == 0)
       .createdAt(instant)
       .updatedAt(instant)
       .build();

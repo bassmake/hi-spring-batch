@@ -20,6 +20,8 @@ public interface Points {
 
   Integer amount();
 
+  Boolean processingFailure();
+
   Instant createdAt();
 
   Instant updatedAt();

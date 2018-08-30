@@ -15,7 +15,6 @@ import java.util.Collection;
 import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import static org.assertj.core.api.Assertions.in;
 import static sk.bsmk.batch.jobs.JobsSchedulingConfiguration.INITIAL_DELAY;
 
 public class SpringBatchJobExplorerTest extends SpringBatchTest {
@@ -63,14 +62,14 @@ public class SpringBatchJobExplorerTest extends SpringBatchTest {
     assertThat(stepExecution.getStatus()).isEqualTo(BatchStatus.COMPLETED);
 
     assertThat(stepExecution.getReadCount()).isEqualTo(count);
-    assertThat(stepExecution.getWriteCount()).isEqualTo(count);
+    assertThat(stepExecution.getWriteCount()).isEqualTo(count / 2);
     assertThat(stepExecution.getCommitCount()).isEqualTo(count + 1);
 
     assertThat(stepExecution.getRollbackCount()).isEqualTo(0);
     assertThat(stepExecution.getReadSkipCount()).isEqualTo(0);
     assertThat(stepExecution.getProcessSkipCount()).isEqualTo(0);
     assertThat(stepExecution.getWriteSkipCount()).isEqualTo(0);
-    assertThat(stepExecution.getFilterCount()).isEqualTo(0);
+    assertThat(stepExecution.getFilterCount()).isEqualTo(count / 2 + count % 2);
     assertThat(stepExecution.getFailureExceptions()).isEmpty();
   }
 
