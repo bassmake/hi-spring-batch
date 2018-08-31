@@ -26,7 +26,7 @@ public class SpringBatchJobExplorerTest extends SpringBatchTest {
 
   // disabled via spring.batch.job.enabled: false
   @Test
-  public void that_job_is_not_available_via_job_explorer() {
+  public void that_job_is_not_available_initially_via_job_explorer() {
     assertThat(jobExplorer.getJobNames()).isEmpty();
     assertThat(pointsService.numberOfActivations()).isZero();
   }
@@ -45,8 +45,6 @@ public class SpringBatchJobExplorerTest extends SpringBatchTest {
     for (int i = 1; i <= jobInstances.size(); i++) {
       validate(jobInstances.get(jobInstances.size() - i), i);
     }
-
-
   }
 
   private void validate(JobInstance jobInstance, int index) {

@@ -1,6 +1,7 @@
 package sk.bsmk.batch.jobs;
 
 import net.javacrumbs.shedlock.core.LockProvider;
+import net.javacrumbs.shedlock.core.SchedulerLock;
 import net.javacrumbs.shedlock.provider.jdbctemplate.JdbcTemplateLockProvider;
 import net.javacrumbs.shedlock.spring.ScheduledLockConfiguration;
 import net.javacrumbs.shedlock.spring.ScheduledLockConfigurationBuilder;
@@ -51,7 +52,7 @@ public class JobsSchedulingConfiguration {
   }
 
   @Scheduled(fixedRate = 1_000, initialDelay = INITIAL_DELAY)
-//  @SchedulerLock(name = "scheduledTaskName")
+  @SchedulerLock(name = PointsActivationJobConfiguration.JOB_NAME)
   public void runPointsActivationJob() throws Exception {
     final JobParameter createdAt = new JobParameter(new Date());
     final Map<String, JobParameter> params = new HashMap<>();
