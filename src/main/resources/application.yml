@@ -7,3 +7,8 @@ spring.batch.job.enabled: false
 
 spring.quartz.job-store-type: jdbc
 spring.quartz.jdbc.initialize-schema: always
+
+
+scheduling:
+  delay: 500
+  rate: 1000

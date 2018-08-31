@@ -51,8 +51,8 @@ public class JobsSchedulingConfiguration {
       .build();
   }
 
-  @Scheduled(fixedRate = 1_000, initialDelay = INITIAL_DELAY)
-  @SchedulerLock(name = PointsActivationJobConfiguration.JOB_NAME)
+  @Scheduled(fixedRateString = "${scheduling.rate}", initialDelayString = "${scheduling.delay}")
+  @SchedulerLock
   public void runPointsActivationJob() throws Exception {
     final JobParameter createdAt = new JobParameter(new Date());
     final Map<String, JobParameter> params = new HashMap<>();
