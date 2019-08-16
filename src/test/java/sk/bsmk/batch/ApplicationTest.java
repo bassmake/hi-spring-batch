@@ -57,10 +57,12 @@ public class ApplicationTest {
     Thread.sleep(1000);
 
     assertThat(executionA.getStatus()).isEqualTo(BatchStatus.COMPLETED);
-    assertThat(executionB.getStatus()).isEqualTo(BatchStatus.COMPLETED);
-
     assertThat(batchRepository.get(batchIdA).state()).isEqualTo(BatchState.PROCESSED_WITH_FAILURES);
+    assertThat(batchRepository.getUnprocessedRows(batchIdA)).containsExactly(2);
+
+    assertThat(executionB.getStatus()).isEqualTo(BatchStatus.COMPLETED);
     assertThat(batchRepository.get(batchIdB).state()).isEqualTo(BatchState.PROCESSED);
+    assertThat(batchRepository.getUnprocessedRows(batchIdB)).isEmpty();
 
     final List<Person> persons = fetchPersons();
     assertThat(persons).hasSize(9);

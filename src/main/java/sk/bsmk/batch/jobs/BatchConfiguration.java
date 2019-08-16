@@ -21,6 +21,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import sk.bsmk.batch.batches.BatchRepository;
 import sk.bsmk.batch.batches.ImmutableRawRow;
 import sk.bsmk.batch.batches.RawRow;
 import sk.bsmk.batch.person.Person;
@@ -82,17 +83,26 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public Step consumingStep(ItemReader<RawRow> reader, JdbcBatchItemWriter<Person> writer) {
+  @JobScope
+  RowSkipListener rowSkipListener(BatchRepository batchRepository) {
+    return new RowSkipListener(batchRepository);
+  }
+
+  @Bean
+  public Step consumingStep(
+      ItemReader<RawRow> reader,
+      JdbcBatchItemWriter<Person> writer,
+      RowSkipListener rowSkipListener) {
     return stepBuilderFactory
         .get("step1")
         .<RawRow, Person>chunk(10)
-        .listener(new RowFailureListener())
         .reader(reader)
         .processor(processor())
         .writer(writer)
         .faultTolerant()
         .skip(Exception.class)
         .skipLimit(Integer.MAX_VALUE)
+        .listener(rowSkipListener)
         .build();
   }
 }
