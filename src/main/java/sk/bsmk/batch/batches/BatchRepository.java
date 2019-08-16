@@ -17,4 +17,8 @@ public class BatchRepository {
   public void updateState(UUID batchId, BatchState state) {
     db.computeIfPresent(batchId, (uuid, batch) -> ImmutableBatch.copyOf(batch).withState(state));
   }
+
+  public Batch get(UUID batchId) {
+    return db.get(batchId);
+  }
 }

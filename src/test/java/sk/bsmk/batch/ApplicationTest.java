@@ -48,13 +48,19 @@ public class ApplicationTest {
   @Test
   public void test() throws Exception {
 
-    final JobExecution executionA = storeBatchAndRun("file-a.csv");
-    final JobExecution executionB = storeBatchAndRun("file-b.csv");
+    final UUID batchIdA = UUID.randomUUID();
+    final UUID batchIdB = UUID.randomUUID();
+
+    final JobExecution executionA = storeBatchAndRun(batchIdA, "file-a.csv");
+    final JobExecution executionB = storeBatchAndRun(batchIdB, "file-b.csv");
 
     Thread.sleep(1000);
 
     assertThat(executionA.getStatus()).isEqualTo(BatchStatus.COMPLETED);
     assertThat(executionB.getStatus()).isEqualTo(BatchStatus.COMPLETED);
+
+    assertThat(batchRepository.get(batchIdA).state()).isEqualTo(BatchState.PROCESSED);
+    assertThat(batchRepository.get(batchIdB).state()).isEqualTo(BatchState.PROCESSED);
 
     final List<Person> persons = fetchPersons();
     assertThat(persons).hasSize(10);
@@ -62,14 +68,10 @@ public class ApplicationTest {
     assertThat(persons).allMatch(person -> person.getPoints() == 1);
   }
 
-  private JobExecution storeBatchAndRun(String fileName) throws Exception {
+  private JobExecution storeBatchAndRun(UUID batchId, String fileName) throws Exception {
 
     final Batch batch =
-        ImmutableBatch.builder()
-            .id(UUID.randomUUID())
-            .fileName(fileName)
-            .state(BatchState.NEW)
-            .build();
+        ImmutableBatch.builder().id(batchId).fileName(fileName).state(BatchState.NEW).build();
 
     batchRepository.store(batch);
 
