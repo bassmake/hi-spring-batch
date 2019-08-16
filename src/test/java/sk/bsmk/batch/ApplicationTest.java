@@ -58,6 +58,8 @@ public class ApplicationTest {
 
     final List<Person> persons = fetchPersons();
     assertThat(persons).hasSize(10);
+
+    assertThat(persons).allMatch(person -> person.getPoints() == 1);
   }
 
   private JobExecution storeBatchAndRun(String fileName) throws Exception {

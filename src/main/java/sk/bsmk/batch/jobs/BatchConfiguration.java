@@ -50,7 +50,7 @@ public class BatchConfiguration {
         .name("personItemReader")
         .resource(new ClassPathResource(fileName))
         .delimited()
-        .names(new String[] {"firstName", "lastName"})
+        .names(new String[] {"firstName", "lastName", "points"})
         .fieldSetMapper(
             new BeanWrapperFieldSetMapper<Person>() {
               {
