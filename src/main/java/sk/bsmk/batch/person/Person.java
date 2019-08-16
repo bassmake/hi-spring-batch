@@ -6,8 +6,7 @@ public class Person {
   private String firstName;
   private Integer points;
 
-  public Person() {
-  }
+  public Person() {}
 
   public Person(String firstName, String lastName, Integer points) {
     this.firstName = firstName;
@@ -41,11 +40,15 @@ public class Person {
 
   @Override
   public String toString() {
-    return "Person{" +
-      "lastName='" + lastName + '\'' +
-      ", firstName='" + firstName + '\'' +
-      ", points=" + points +
-      '}';
+    return "Person{"
+        + "lastName='"
+        + lastName
+        + '\''
+        + ", firstName='"
+        + firstName
+        + '\''
+        + ", points="
+        + points
+        + '}';
   }
-
 }

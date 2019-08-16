@@ -19,5 +19,4 @@ public class PersonItemProcessor implements ItemProcessor<Person, Person> {
 
     return transformedPerson;
   }
-
 }

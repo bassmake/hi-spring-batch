@@ -1,5 +1,6 @@
 package sk.bsmk.batch.jobs;
 
+import javax.sql.DataSource;
 import org.springframework.batch.core.Job;
 import org.springframework.batch.core.Step;
 import org.springframework.batch.core.configuration.JobRegistry;
@@ -24,19 +25,15 @@ import org.springframework.core.io.ClassPathResource;
 import sk.bsmk.batch.person.Person;
 import sk.bsmk.batch.person.PersonItemProcessor;
 
-import javax.sql.DataSource;
-
 @Configuration
 @EnableBatchProcessing
 public class BatchConfiguration {
 
   public static final String JOB_NAME = "importUserJob";
 
-  @Autowired
-  public JobBuilderFactory jobBuilderFactory;
+  @Autowired public JobBuilderFactory jobBuilderFactory;
 
-  @Autowired
-  public StepBuilderFactory stepBuilderFactory;
+  @Autowired public StepBuilderFactory stepBuilderFactory;
 
   @Bean
   public JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor(JobRegistry jobRegistry) {
@@ -48,17 +45,19 @@ public class BatchConfiguration {
   @Bean
   @JobScope
   public FlatFileItemReader<Person> reader(
-    @Value(JobParameterKeys.FILE_NAME_PARAM) String fileName
-  ) {
+      @Value(JobParameterKeys.FILE_NAME_PARAM) String fileName) {
     return new FlatFileItemReaderBuilder<Person>()
-      .name("personItemReader")
-      .resource(new ClassPathResource(fileName))
-      .delimited()
-      .names(new String[]{"firstName", "lastName"})
-      .fieldSetMapper(new BeanWrapperFieldSetMapper<Person>() {{
-        setTargetType(Person.class);
-      }})
-      .build();
+        .name("personItemReader")
+        .resource(new ClassPathResource(fileName))
+        .delimited()
+        .names(new String[] {"firstName", "lastName"})
+        .fieldSetMapper(
+            new BeanWrapperFieldSetMapper<Person>() {
+              {
+                setTargetType(Person.class);
+              }
+            })
+        .build();
   }
 
   @Bean
@@ -69,30 +68,32 @@ public class BatchConfiguration {
   @Bean
   public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
     return new JdbcBatchItemWriterBuilder<Person>()
-      .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
-      .sql("INSERT INTO people (first_name, last_name, points) VALUES (:firstName, :lastName, :points)")
-      .dataSource(dataSource)
-      .build();
+        .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
+        .sql(
+            "INSERT INTO people (first_name, last_name, points) VALUES (:firstName, :lastName, :points)")
+        .dataSource(dataSource)
+        .build();
   }
 
   @Bean
   public Job importUserJob(JobCompletionNotificationListener listener, Step step1) {
-    return jobBuilderFactory.get(JOB_NAME)
-      .incrementer(new RunIdIncrementer())
-      .listener(listener)
-      .flow(step1)
-      .end()
-      .build();
+    return jobBuilderFactory
+        .get(JOB_NAME)
+        .incrementer(new RunIdIncrementer())
+        .listener(listener)
+        .flow(step1)
+        .end()
+        .build();
   }
 
   @Bean
   public Step step1(ItemReader<Person> reader, JdbcBatchItemWriter<Person> writer) {
-    return stepBuilderFactory.get("step1")
-      .<Person, Person> chunk(10)
-      .reader(reader)
-      .processor(processor())
-      .writer(writer)
-      .build();
+    return stepBuilderFactory
+        .get("step1")
+        .<Person, Person>chunk(10)
+        .reader(reader)
+        .processor(processor())
+        .writer(writer)
+        .build();
   }
-
 }
