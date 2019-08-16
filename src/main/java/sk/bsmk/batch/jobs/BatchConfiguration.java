@@ -16,12 +16,13 @@ import org.springframework.batch.item.database.JdbcBatchItemWriter;
 import org.springframework.batch.item.database.builder.JdbcBatchItemWriterBuilder;
 import org.springframework.batch.item.file.FlatFileItemReader;
 import org.springframework.batch.item.file.builder.FlatFileItemReaderBuilder;
-import org.springframework.batch.item.file.mapping.BeanWrapperFieldSetMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
+import sk.bsmk.batch.batches.ImmutableRawRow;
+import sk.bsmk.batch.batches.RawRow;
 import sk.bsmk.batch.person.Person;
 import sk.bsmk.batch.person.PersonItemProcessor;
 
@@ -44,19 +45,14 @@ public class BatchConfiguration {
 
   @Bean
   @JobScope
-  public FlatFileItemReader<Person> reader(
+  public FlatFileItemReader<RawRow> reader(
       @Value(JobParameterKeys.FILE_NAME_PARAM) String fileName) {
-    return new FlatFileItemReaderBuilder<Person>()
+    return new FlatFileItemReaderBuilder<RawRow>()
         .name("personItemReader")
         .resource(new ClassPathResource(fileName))
-        .delimited()
-        .names(new String[] {"firstName", "lastName", "points"})
-        .fieldSetMapper(
-            new BeanWrapperFieldSetMapper<Person>() {
-              {
-                setTargetType(Person.class);
-              }
-            })
+        .lineMapper(
+            (line, lineNumber) ->
+                ImmutableRawRow.builder().lineNumber(lineNumber).line(line).build())
         .build();
   }
 
@@ -87,10 +83,10 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public Step step1(ItemReader<Person> reader, JdbcBatchItemWriter<Person> writer) {
+  public Step consumingStep(ItemReader<RawRow> reader, JdbcBatchItemWriter<Person> writer) {
     return stepBuilderFactory
         .get("step1")
-        .<Person, Person>chunk(10)
+        .<RawRow, Person>chunk(10)
         .reader(reader)
         .processor(processor())
         .writer(writer)
