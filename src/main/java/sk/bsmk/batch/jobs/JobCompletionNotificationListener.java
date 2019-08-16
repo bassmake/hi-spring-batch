@@ -23,7 +23,12 @@ public class JobCompletionNotificationListener extends JobExecutionListenerSuppo
   public void afterJob(JobExecution jobExecution) {
     if (jobExecution.getStatus() == BatchStatus.COMPLETED) {
       final String batchId = jobExecution.getJobParameters().getString(JobParameterKeys.BATCH_ID);
-      batchRepository.updateState(UUID.fromString(batchId), BatchState.PROCESSED);
+      final BatchState batchState =
+          jobExecution.getStepExecutions().stream()
+                  .anyMatch(stepExecution -> stepExecution.getProcessSkipCount() > 0)
+              ? BatchState.PROCESSED_WITH_FAILURES
+              : BatchState.PROCESSED;
+      batchRepository.updateState(UUID.fromString(batchId), batchState);
     }
   }
 }

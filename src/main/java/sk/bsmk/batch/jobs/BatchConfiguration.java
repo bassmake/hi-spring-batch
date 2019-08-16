@@ -24,7 +24,6 @@ import org.springframework.core.io.ClassPathResource;
 import sk.bsmk.batch.batches.ImmutableRawRow;
 import sk.bsmk.batch.batches.RawRow;
 import sk.bsmk.batch.person.Person;
-import sk.bsmk.batch.person.PersonItemProcessor;
 
 @Configuration
 @EnableBatchProcessing
@@ -87,9 +86,13 @@ public class BatchConfiguration {
     return stepBuilderFactory
         .get("step1")
         .<RawRow, Person>chunk(10)
+        .listener(new RowFailureListener())
         .reader(reader)
         .processor(processor())
         .writer(writer)
+        .faultTolerant()
+        .skip(Exception.class)
+        .skipLimit(Integer.MAX_VALUE)
         .build();
   }
 }

@@ -43,7 +43,7 @@ public class ApplicationTest {
 
   @Autowired private JdbcTemplate jdbcTemplate;
 
-  @Autowired BatchRepository batchRepository;
+  @Autowired private BatchRepository batchRepository;
 
   @Test
   public void test() throws Exception {
@@ -59,11 +59,11 @@ public class ApplicationTest {
     assertThat(executionA.getStatus()).isEqualTo(BatchStatus.COMPLETED);
     assertThat(executionB.getStatus()).isEqualTo(BatchStatus.COMPLETED);
 
-    assertThat(batchRepository.get(batchIdA).state()).isEqualTo(BatchState.PROCESSED);
+    assertThat(batchRepository.get(batchIdA).state()).isEqualTo(BatchState.PROCESSED_WITH_FAILURES);
     assertThat(batchRepository.get(batchIdB).state()).isEqualTo(BatchState.PROCESSED);
 
     final List<Person> persons = fetchPersons();
-    assertThat(persons).hasSize(10);
+    assertThat(persons).hasSize(9);
 
     assertThat(persons).allMatch(person -> person.getPoints() == 1);
   }

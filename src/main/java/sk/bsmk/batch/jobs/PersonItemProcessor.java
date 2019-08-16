@@ -1,4 +1,4 @@
-package sk.bsmk.batch.person;
+package sk.bsmk.batch.jobs;
 
 import com.univocity.parsers.common.record.Record;
 import com.univocity.parsers.csv.CsvParser;
@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import sk.bsmk.batch.batches.RawRow;
+import sk.bsmk.batch.person.Person;
 
 public class PersonItemProcessor implements ItemProcessor<RawRow, Person> {
 
