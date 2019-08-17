@@ -1,4 +1,4 @@
-package sk.bsmk.batch.batches;
+package sk.bsmk.batch.parser;
 
 public enum PointsImportColumn {
   TYPE,
