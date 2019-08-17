@@ -1,9 +1,7 @@
 package sk.bsmk.batch.jobs;
 
-import com.univocity.parsers.common.ParsingContext;
 import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.common.processor.InputValueSwitch;
-import com.univocity.parsers.common.processor.ObjectRowProcessor;
 import com.univocity.parsers.csv.CsvParser;
 import com.univocity.parsers.csv.CsvParserSettings;
 import java.io.StringReader;
@@ -11,8 +9,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
 import sk.bsmk.batch.batches.RawRow;
-import sk.bsmk.batch.parser.PointsImportColumn;
 import sk.bsmk.batch.parser.PointsImportRow;
+import sk.bsmk.batch.parser.PointsImportRowTypeA;
+import sk.bsmk.batch.parser.PointsImportRowTypeB;
 import sk.bsmk.batch.person.Person;
 
 public class PersonItemProcessor implements ItemProcessor<RawRow, Person> {
@@ -20,35 +19,21 @@ public class PersonItemProcessor implements ItemProcessor<RawRow, Person> {
   private static final Logger log = LoggerFactory.getLogger(PersonItemProcessor.class);
 
   private final CsvParser csvParser;
-  private final BeanListProcessor<PointsImportRow> processor =
-      new BeanListProcessor<>(PointsImportRow.class, 1);
+  private final BeanListProcessor<PointsImportRowTypeA> processorTypeA =
+      new BeanListProcessor<>(PointsImportRowTypeA.class, 1);
+
+  private final BeanListProcessor<PointsImportRowTypeB> processorTypeB =
+      new BeanListProcessor<>(PointsImportRowTypeB.class, 1);
+
+  private final InputValueSwitch inputSwitchProcessor = new InputValueSwitch(0);
 
   {
-    final ObjectRowProcessor typeAProcessor =
-        new ObjectRowProcessor() {
-          @Override
-          public void rowProcessed(Object[] row, ParsingContext context) {}
-        };
-
-    final InputValueSwitch inputValueSwitch =
-        new InputValueSwitch(PointsImportColumn.TYPE.name()) {};
+    inputSwitchProcessor.addSwitchForValue("A", processorTypeA);
+    inputSwitchProcessor.addSwitchForValue("B", processorTypeB);
 
     final CsvParserSettings settings = new CsvParserSettings();
     settings.getFormat().setDelimiter(',');
-    //    settings.setHeaders(
-    //        PointsImportColumn.TYPE.name(),
-    //        PointsImportColumn.FIRST_NAME.name(),
-    //        PointsImportColumn.LAST_NAME.name(),
-    //        PointsImportColumn.POINTS.name());
-    //    settings.setProcessor(inputValueSwitch);
-    settings.setProcessor(processor);
-    //    settings.setProcessorErrorHandler(new RowProcessorErrorHandler() {
-    //      @Override
-    //      public void handleError(DataProcessingException error, Object[] inputRow, ParsingContext
-    // context) {
-    //        // TODO
-    //      }
-    //    });
+    settings.setProcessor(inputSwitchProcessor);
 
     csvParser = new CsvParser(settings);
   }
@@ -57,13 +42,24 @@ public class PersonItemProcessor implements ItemProcessor<RawRow, Person> {
   public Person process(final RawRow rawRow) throws Exception {
 
     csvParser.parse(new StringReader(rawRow.line()));
-    final PointsImportRow row = processor.getBeans().get(0);
+
+    final PointsImportRow row = extractRow();
 
     final Person transformedPerson =
-        new Person(row.getFirstName(), row.getSecondName(), row.getPoints());
+        new Person(row.getFirstName(), row.getLastName(), row.getPoints());
 
     log.info("Converting (" + rawRow + ") into (" + transformedPerson + ")");
 
     return transformedPerson;
+  }
+
+  private PointsImportRow extractRow() {
+    if (processorTypeA.getBeans().size() == 1) {
+      return processorTypeA.getBeans().get(0);
+    }
+    if (processorTypeB.getBeans().size() == 1) {
+      return processorTypeB.getBeans().get(0);
+    }
+    throw new RuntimeException("Unable to extract row");
   }
 }
