@@ -20,6 +20,7 @@ public class PersonItemProcessor implements ItemProcessor<RawRow, Person> {
     final CsvParserSettings settings = new CsvParserSettings();
     settings.getFormat().setDelimiter(',');
     settings.setHeaders(
+        PointsImportColumn.TYPE.name(),
         PointsImportColumn.FIRST_NAME.name(),
         PointsImportColumn.LAST_NAME.name(),
         PointsImportColumn.POINTS.name());
