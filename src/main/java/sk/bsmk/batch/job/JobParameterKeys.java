@@ -1,4 +1,4 @@
-package sk.bsmk.batch.jobs;
+package sk.bsmk.batch.job;
 
 public class JobParameterKeys {
 

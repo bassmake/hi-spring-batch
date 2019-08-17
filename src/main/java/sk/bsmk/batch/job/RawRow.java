@@ -1,4 +1,4 @@
-package sk.bsmk.batch.batches;
+package sk.bsmk.batch.job;
 
 import org.immutables.value.Value;
 

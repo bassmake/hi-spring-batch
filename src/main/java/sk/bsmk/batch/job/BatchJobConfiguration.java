@@ -1,4 +1,4 @@
-package sk.bsmk.batch.jobs;
+package sk.bsmk.batch.job;
 
 import javax.sql.DataSource;
 import org.springframework.batch.core.Job;
@@ -22,13 +22,14 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.io.ClassPathResource;
 import sk.bsmk.batch.batches.BatchRepository;
-import sk.bsmk.batch.batches.ImmutableRawRow;
-import sk.bsmk.batch.batches.RawRow;
 import sk.bsmk.batch.person.Person;
 
+/**
+ * Contains definitions of spring job with one step that consists of reader, processor and writer.
+ */
 @Configuration
 @EnableBatchProcessing
-public class BatchConfiguration {
+public class BatchJobConfiguration {
 
   public static final String JOB_NAME = "importUserJob";
 
@@ -41,6 +42,36 @@ public class BatchConfiguration {
     JobRegistryBeanPostProcessor jobRegistryBeanPostProcessor = new JobRegistryBeanPostProcessor();
     jobRegistryBeanPostProcessor.setJobRegistry(jobRegistry);
     return jobRegistryBeanPostProcessor;
+  }
+
+  @Bean
+  public Job importUserJob(JobCompletionListener listener, Step step1) {
+    return jobBuilderFactory
+        .get(JOB_NAME)
+        .incrementer(new RunIdIncrementer())
+        .listener(listener)
+        .flow(step1)
+        .end()
+        .build();
+  }
+
+  @Bean
+  public Step consumingStep(
+      ItemReader<RawRow> reader,
+      PersonItemProcessor processor,
+      JdbcBatchItemWriter<Person> writer,
+      RowSkipListener rowSkipListener) {
+    return stepBuilderFactory
+        .get("processing")
+        .<RawRow, Person>chunk(10)
+        .reader(reader)
+        .processor(processor)
+        .writer(writer)
+        .faultTolerant()
+        .skip(Exception.class)
+        .skipLimit(Integer.MAX_VALUE)
+        .listener(rowSkipListener)
+        .build();
   }
 
   @Bean
@@ -57,11 +88,6 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public PersonItemProcessor processor() {
-    return new PersonItemProcessor();
-  }
-
-  @Bean
   public JdbcBatchItemWriter<Person> writer(DataSource dataSource) {
     return new JdbcBatchItemWriterBuilder<Person>()
         .itemSqlParameterSourceProvider(new BeanPropertyItemSqlParameterSourceProvider<>())
@@ -72,37 +98,8 @@ public class BatchConfiguration {
   }
 
   @Bean
-  public Job importUserJob(JobCompletionNotificationListener listener, Step step1) {
-    return jobBuilderFactory
-        .get(JOB_NAME)
-        .incrementer(new RunIdIncrementer())
-        .listener(listener)
-        .flow(step1)
-        .end()
-        .build();
-  }
-
-  @Bean
   @JobScope
   RowSkipListener rowSkipListener(BatchRepository batchRepository) {
     return new RowSkipListener(batchRepository);
-  }
-
-  @Bean
-  public Step consumingStep(
-      ItemReader<RawRow> reader,
-      JdbcBatchItemWriter<Person> writer,
-      RowSkipListener rowSkipListener) {
-    return stepBuilderFactory
-        .get("step1")
-        .<RawRow, Person>chunk(10)
-        .reader(reader)
-        .processor(processor())
-        .writer(writer)
-        .faultTolerant()
-        .skip(Exception.class)
-        .skipLimit(Integer.MAX_VALUE)
-        .listener(rowSkipListener)
-        .build();
   }
 }

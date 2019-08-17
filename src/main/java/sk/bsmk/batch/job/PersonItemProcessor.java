@@ -1,4 +1,4 @@
-package sk.bsmk.batch.jobs;
+package sk.bsmk.batch.job;
 
 import com.univocity.parsers.common.processor.BeanListProcessor;
 import com.univocity.parsers.common.processor.InputValueSwitch;
@@ -8,12 +8,17 @@ import java.io.StringReader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.batch.item.ItemProcessor;
-import sk.bsmk.batch.batches.RawRow;
+import org.springframework.stereotype.Component;
 import sk.bsmk.batch.parser.PointsImportRow;
 import sk.bsmk.batch.parser.PointsImportRowTypeA;
 import sk.bsmk.batch.parser.PointsImportRowTypeB;
 import sk.bsmk.batch.person.Person;
 
+/**
+ * Here are used {@link com.univocity.parsers.common.processor.core.Processor}s to actually process
+ * csv rows, a.k.a. business logic.
+ */
+@Component
 public class PersonItemProcessor implements ItemProcessor<RawRow, Person> {
 
   private static final Logger log = LoggerFactory.getLogger(PersonItemProcessor.class);

@@ -1,4 +1,4 @@
-package sk.bsmk.batch.jobs;
+package sk.bsmk.batch.job;
 
 import java.util.UUID;
 import org.springframework.batch.core.BatchStatus;
@@ -9,13 +9,17 @@ import org.springframework.stereotype.Component;
 import sk.bsmk.batch.batches.BatchRepository;
 import sk.bsmk.batch.batches.BatchState;
 
+/**
+ * Check if all rows were processed correctly at the end of processing (step) and sets state
+ * properly.
+ */
 @Component
-public class JobCompletionNotificationListener extends JobExecutionListenerSupport {
+public class JobCompletionListener extends JobExecutionListenerSupport {
 
   private final BatchRepository batchRepository;
 
   @Autowired
-  public JobCompletionNotificationListener(BatchRepository batchRepository) {
+  public JobCompletionListener(BatchRepository batchRepository) {
     this.batchRepository = batchRepository;
   }
 

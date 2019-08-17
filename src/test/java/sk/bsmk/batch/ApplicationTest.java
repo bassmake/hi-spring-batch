@@ -1,7 +1,7 @@
 package sk.bsmk.batch;
 
 import static org.assertj.core.api.Assertions.*;
-import static sk.bsmk.batch.jobs.BatchConfiguration.JOB_NAME;
+import static sk.bsmk.batch.job.BatchJobConfiguration.JOB_NAME;
 
 import java.util.List;
 import java.util.UUID;
@@ -24,7 +24,7 @@ import sk.bsmk.batch.batches.Batch;
 import sk.bsmk.batch.batches.BatchRepository;
 import sk.bsmk.batch.batches.BatchState;
 import sk.bsmk.batch.batches.ImmutableBatch;
-import sk.bsmk.batch.jobs.JobParameterKeys;
+import sk.bsmk.batch.job.JobParameterKeys;
 import sk.bsmk.batch.person.Person;
 
 @SpringBootTest(classes = Application.class)

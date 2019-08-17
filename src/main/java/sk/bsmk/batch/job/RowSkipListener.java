@@ -1,4 +1,4 @@
-package sk.bsmk.batch.jobs;
+package sk.bsmk.batch.job;
 
 import java.util.UUID;
 import org.slf4j.Logger;
@@ -7,10 +7,11 @@ import org.springframework.batch.core.StepExecution;
 import org.springframework.batch.core.annotation.BeforeStep;
 import org.springframework.batch.core.annotation.OnSkipInProcess;
 import sk.bsmk.batch.batches.BatchRepository;
-import sk.bsmk.batch.batches.RawRow;
 
 /**
- * I was not able to access stepExecution via {@link
+ * Listens to rows that were not processed correctly and stores information to some repository.
+ *
+ * <p>I was not able to access stepExecution via {@link
  * org.springframework.batch.core.listener.SkipListenerSupport}.
  */
 public class RowSkipListener {
